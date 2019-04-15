@@ -4,7 +4,7 @@ import {get, set} from '@ember/object';
 
 
 export default class ClassRoom extends Component {
-    server = "http://janus.allright.io:8088/janus";
+    // server = "http://janus.allright.io:8088/janus";
     opaqueId = 'videoroomtest' + Number(new Date());
     myRoom = 1234;
 
@@ -25,6 +25,13 @@ export default class ClassRoom extends Component {
 
 
     didInsertElement() {
+
+        if(window.location.protocol === 'http:'){
+            this.server = "http://" + window.location.hostname + ":8088/janus";
+        } else {
+            this.server = "https://" + window.location.hostname + ":8089/janus";
+        }
+
         this.initializeJanus();
     }
 
