@@ -481,8 +481,8 @@ export default class ClassRoom extends Component {
                     remoteVideo.setAttribute('playsinline', '');
 
                     remoteVideo.addEventListener('playing', () => {
-                        let width = subscriber.videoWidth;
-                        let height = subscriber.videoHeight;
+                        // let width = subscriber.videoWidth;
+                        // let height = subscriber.videoHeight;
 
                         if (Janus.webRTCAdapter.browserDetails.browser === "firefox") {
                             // Firefox Stable has a bug: width and height are not immediately available after a playing
