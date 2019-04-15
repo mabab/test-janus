@@ -292,7 +292,7 @@ export default class ClassRoom extends Component {
                     return false;
                 }
 
-                this.sfuPlugin.send({"message": { "request": "configure", "bitrate": 0 }});
+                this.sfuPlugin.send({"message": { "request": "configure", "bitrate": 256*1000 }});
             },
             oncleanup: () => {
                 Janus.log(" ::: Got a cleanup notification: we are unpublished now :::");
