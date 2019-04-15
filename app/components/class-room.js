@@ -23,13 +23,12 @@ export default class ClassRoom extends Component {
     myUsername = Janus.randomString(6);
 
 
-
     didInsertElement() {
 
-        if(window.location.protocol === 'http:'){
-            this.server = "http://" + window.location.hostname + ":8088/janus";
+        if (window.location.protocol === 'http:') {
+            this.server = "http://" + 'janus.allright.io' + ":8088/janus";
         } else {
-            this.server = "https://" + window.location.hostname + ":8089/janus";
+            this.server = "https://" + 'janus.allright.io' + ":8089/janus";
         }
 
         this.initializeJanus();
@@ -39,18 +38,18 @@ export default class ClassRoom extends Component {
     initializeJanus() {
         Janus.init({
             debug: true,
-            callback: () =>{
+            callback: () => {
                 this.janusInitCallback();
             }
         })
     }
 
 
-    janusInitCallback(){
+    janusInitCallback() {
 
         // Make sure the browser supports WebRTC
 
-        if(!Janus.isWebrtcSupported()) {
+        if (!Janus.isWebrtcSupported()) {
             alert('No WebRTC support...');
             return false;
         }
@@ -58,7 +57,7 @@ export default class ClassRoom extends Component {
 
         this.janusSession = new Janus({
             server: this.server,
-            success: (...args) =>{
+            success: (...args) => {
                 this.connect(...args);
             },
             error(error) {
@@ -66,7 +65,7 @@ export default class ClassRoom extends Component {
                 alert(error);
                 window.location.reload();
             },
-            destroyed(){
+            destroyed() {
                 window.location.reload();
             }
         });
@@ -76,7 +75,7 @@ export default class ClassRoom extends Component {
     /**
      * Attach to video room
      */
-    connect(){
+    connect() {
         this.janusSession.attach({
             plugin: 'janus.plugin.videoroom',
             opaqueId: this.opaqueId,
@@ -101,8 +100,8 @@ export default class ClassRoom extends Component {
 
                 let eventName = get(msg, 'videoroom');
 
-                if (eventName){
-                    if (eventName === 'joined'){
+                if (eventName) {
+                    if (eventName === 'joined') {
                         // Publisher/manager created, negotiate WebRTC and attach to existing feeds, if any
                         this.myId = get(msg, 'id');
                         this.myPrivateId = get(msg, 'private_id');
@@ -113,83 +112,76 @@ export default class ClassRoom extends Component {
 
                         // Any new feed to attach to?
                         let publishers = get(msg, 'publishers');
-                        if (publishers){
+                        if (publishers) {
 
                             Janus.debug("Got a list of available publishers/feeds:");
                             Janus.debug(publishers);
 
-                            for (let variable in publishers){
+                            for (let variable in publishers) {
 
-                                if (!publishers.hasOwnProperty(variable)){
+                                if (!publishers.hasOwnProperty(variable)) {
                                     return false;
                                 }
                                 let publisher = publishers[variable];
-                                let id = get (publisher, 'id');
-                                let display = get (publisher, 'display');
-                                let audio = get (publisher, 'audio_codec');
-                                let video = get (publisher, 'video_codec');
+                                let id = get(publisher, 'id');
+                                let display = get(publisher, 'display');
+                                let audio = get(publisher, 'audio_codec');
+                                let video = get(publisher, 'video_codec');
                                 Janus.debug(`  >> [${id}] ${display} (audio: ${audio}, video: ${video})`);
 
                                 this.newRemoteFeed(id, display, audio, video);
                             }
                         }
-                    }
-
-                    if ( eventName === 'destroyed'){
+                    } else if (eventName === 'destroyed') {
                         // The room has been destroyed
-                    }
-
-                    if (eventName === 'event') {
+                        window.location.reload();
+                    } else if (eventName === 'event') {
                         // Any new feed to attach to?
                         let publishers = get(msg, 'publishers');
                         let leaving = get(msg, 'leaving');
                         let unpublished = get(msg, 'unpublished');
                         let error = get(msg, 'error');
 
-                        if (publishers){
+                        if (publishers) {
 
                             Janus.debug("Got a list of available publishers/feeds:");
                             Janus.debug(publishers);
 
-                            for (let variable in publishers){
+                            for (let variable in publishers) {
 
-                                if (!publishers.hasOwnProperty(variable)){
+                                if (!publishers.hasOwnProperty(variable)) {
                                     return false;
                                 }
                                 let publisher = publishers[variable];
-                                let id = get (publisher, 'id');
-                                let display = get (publisher, 'display');
-                                let audio = get (publisher, 'audio_codec');
-                                let video = get (publisher, 'video_codec');
+                                let id = get(publisher, 'id');
+                                let display = get(publisher, 'display');
+                                let audio = get(publisher, 'audio_codec');
+                                let video = get(publisher, 'video_codec');
                                 Janus.debug(`  >> [${id}] ${display} (audio: ${audio}, video: ${video})`);
 
                                 this.newRemoteFeed(id, display, audio, video);
                             }
-                        }
-
-                        if (leaving){
+                        } else if (leaving) {
                             Janus.log("Publisher left: " + leaving);
                             let remoteFeed = null;
 
-                            for (let i = 1; i < 6; i++){
-                                if (this.feeds[i] && this.feeds[i] === leaving){
+                            for (let i = 1; i < 6; i++) {
+                                if (this.feeds[i] && this.feeds[i] === leaving) {
                                     remoteFeed = this.feeds[i];
                                     break;
                                 }
                             }
 
-                            if (remoteFeed){
+                            if (remoteFeed) {
                                 Janus.debug("Feed " + remoteFeed.rfid + " (" + remoteFeed.rfdisplay + ") has left the room, detaching");
                                 this.feeds[remoteFeed.rfindex] = null;
                                 remoteFeed.detach();
                             }
-                        }
-
-                        if (unpublished){
+                        } else if (unpublished) {
                             // One of the publishers has unpublished?
                             Janus.log("Publisher left: " + unpublished);
 
-                            if (unpublished === 'ok'){
+                            if (unpublished === 'ok') {
                                 // That's us
                                 this.sfuPlugin.hangup();
                                 return false;
@@ -197,22 +189,22 @@ export default class ClassRoom extends Component {
 
                             let remoteFeed = null;
 
-                            for (let i = 1; i < 6; i++){
-                                if (this.feeds[i] && this.feeds[i] === leaving){
+                            for (let i = 1; i < 6; i++) {
+                                if (this.feeds[i] && this.feeds[i] === leaving) {
                                     remoteFeed = this.feeds[i];
                                     break;
                                 }
                             }
 
-                            if (remoteFeed){
+                            if (remoteFeed) {
                                 Janus.debug("Feed " + remoteFeed.rfid + " (" + remoteFeed.rfdisplay + ") has left the room, detaching");
                                 this.feeds[remoteFeed.rfindex] = null;
                                 remoteFeed.detach();
                             }
                         }
 
-                        if (error){
-                            if (get(msg, 'error_code') === 426){
+                        if (error) {
+                            if (get(msg, 'error_code') === 426) {
                                 alert(
                                     "<p>Apparently room <code>" + this.myRoom + "</code> (the one this demo uses as a test room) " +
                                     "does not exist...</p><p>Do you have an updated <code>janus.plugin.videoroom.cfg</code> " +
@@ -228,7 +220,7 @@ export default class ClassRoom extends Component {
 
                 }
 
-                if (jsep){
+                if (jsep) {
                     Janus.debug("Handling SDP as well...");
                     Janus.debug(jsep);
 
@@ -239,7 +231,7 @@ export default class ClassRoom extends Component {
                     let audio = get(msg, 'audio_codec');
                     let video = get(msg, 'video_codec');
 
-                    if(
+                    if (
                         this.myStream &&
                         this.myStream.getAudioTracks() &&
                         this.myStream.getAudioTracks().length > 0 &&
@@ -249,7 +241,7 @@ export default class ClassRoom extends Component {
                         console.warning("Our audio stream has been rejected, viewers won't hear us");
                     }
 
-                    if(
+                    if (
                         this.myStream &&
                         this.myStream.getVideoTracks() &&
                         this.myStream.getVideoTracks().length > 0 &&
@@ -272,7 +264,7 @@ export default class ClassRoom extends Component {
 
                 let videoElement = VideoContainer.querySelector('video#publisher');
 
-                if (!videoElement){
+                if (!videoElement) {
                     videoElement = document.createElement('video');
                     videoElement.id = 'publisher';
                 }
@@ -285,19 +277,18 @@ export default class ClassRoom extends Component {
                 videoElement.muted = 'muted';
 
 
-
                 VideoContainer.append(videoElement);
             },
 
-            error(error){
+            error(error) {
                 Janus.log("  -- Error attaching plugin...", error);
             },
-            consentDialog(on){
+            consentDialog(on) {
                 Janus.log("Consent dialog should be " + (on ? "on" : "off") + " now");
             },
-            webrtcState(on){
+            webrtcState(on) {
                 Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
-                if(!on){
+                if (!on) {
                     return false;
                 }
 
@@ -306,12 +297,13 @@ export default class ClassRoom extends Component {
             oncleanup: () => {
                 Janus.log(" ::: Got a cleanup notification: we are unpublished now :::");
                 this.myStream = null;
+                this.publishOwnFeed(true);
             }
         })
     }
 
 
-    publishOwnFeed(useAudio){
+    publishOwnFeed(useAudio) {
         this.sfuPlugin.createOffer({
             // Add data:true here if you want to publish datachannels as well
             media: {
@@ -325,7 +317,7 @@ export default class ClassRoom extends Component {
             // pass a ?simulcast=true when opening this demo page: it will turn
             // the following 'simulcast' property to pass to janus.js to true
             simulcast: true,
-            success: (jsep) =>{
+            success: (jsep) => {
                 Janus.debug("Got publisher SDP!");
                 Janus.debug(jsep);
 
@@ -351,7 +343,7 @@ export default class ClassRoom extends Component {
                     jsep: jsep
                 })
             },
-            error: (error) =>{
+            error: (error) => {
                 Janus.error("WebRTC error:", error);
 
                 if (useAudio) {
@@ -365,13 +357,13 @@ export default class ClassRoom extends Component {
     }
 
 
-    newRemoteFeed(id, display, audio, video){
+    newRemoteFeed(id, display, audio, video) {
         let remoteFeed = null;
 
         let subscriber = this.janusSession.attach({
             plugin: "janus.plugin.videoroom",
             opaqueId: this.opaqueId,
-            success: (pluginHandle) =>{
+            success: (pluginHandle) => {
                 remoteFeed = pluginHandle;
                 remoteFeed.simulcastStarted = false;
                 Janus.log("Plugin attached! (" + remoteFeed.getPlugin() + ", id=" + remoteFeed.getId() + ")");
@@ -384,9 +376,9 @@ export default class ClassRoom extends Component {
                     private_id: this.myPrivateId
                 };
 
-                if(Janus.webRTCAdapter.browserDetails.browser === "safari" &&
+                if (Janus.webRTCAdapter.browserDetails.browser === "safari" &&
                     (video === "vp9" || (video === "vp8" && !Janus.safariVp8))) {
-                    if(video){
+                    if (video) {
                         video = video.toUpperCase();
                     }
 
@@ -399,7 +391,7 @@ export default class ClassRoom extends Component {
                     message: subscribe
                 });
             },
-            onmessage: (msg, jsep) =>{
+            onmessage: (msg, jsep) => {
                 Janus.debug(" ::: Got a message (subscriber) :::");
                 Janus.debug(msg);
 
@@ -408,13 +400,13 @@ export default class ClassRoom extends Component {
 
                 let error = get(msg, 'error');
 
-                if (error){
+                if (error) {
                     alert(error);
-                } else if (eventName){
-                    if (eventName === 'attached'){
+                } else if (eventName) {
+                    if (eventName === 'attached') {
 
-                        for (let i = 1; i < this.MAX_SIZE_SUBSCRIBERS; i++){
-                            if (this.feeds[i]){
+                        for (let i = 1; i < this.MAX_SIZE_SUBSCRIBERS; i++) {
+                            if (this.feeds[i]) {
                                 this.feeds[i] = remoteFeed;
                                 remoteFeed.rfindex = i;
                                 break;
@@ -426,16 +418,14 @@ export default class ClassRoom extends Component {
 
 
                         Janus.log(`Successfully attached to feed ${remoteFeed.rfid} (${remoteFeed.rfdisplay}) in room ${get(msg, 'room')}]`);
-                    }
-
-                    if (eventName === 'event'){
+                    } else if (eventName === 'event') {
                         // Check if we got an event on a simulcast-related event from this publisher
                         let substream = get(msg, 'substream');
                         let temporal = get(msg, 'temporal');
                     }
                 }
 
-                if (jsep){
+                if (jsep) {
                     Janus.debug("Handling SDP as well...");
                     Janus.debug(jsep);
 
@@ -468,33 +458,33 @@ export default class ClassRoom extends Component {
                 }
 
             },
-            error: (error) =>{
+            error: (error) => {
                 Janus.error("  -- Error attaching plugin...", error);
                 alert("Error attaching plugin... " + error);
             },
-            webrtcState: function(on) {
+            webrtcState: function (on) {
                 Janus.log("Janus says this WebRTC PeerConnection (feed #" + remoteFeed.rfindex + ") is " + (on ? "up" : "down") + " now");
             },
-            onlocalstream: (onlocalstream) =>{
+            onlocalstream: (onlocalstream) => {
                 // The subscriber stream is recvonly, we don't expect anything here
             },
-            onremotestream: (stream) =>{
+            onremotestream: (stream) => {
                 Janus.debug("Remote feed #" + remoteFeed.rfindex);
                 let VideoContainer = document.querySelector('#container');
                 let remoteVideo = VideoContainer.querySelector(`video#remotedvideo-${remoteFeed.rfindex}`);
 
-                if (!remoteVideo){
+                if (!remoteVideo) {
                     remoteVideo = document.createElement('video');
                     remoteVideo.id = `remotedvideo-${remoteFeed.rfindex}`;
 
                     remoteVideo.setAttribute('autoplay', '');
                     remoteVideo.setAttribute('playsinline', '');
 
-                    remoteVideo.addEventListener('playing', () =>{
+                    remoteVideo.addEventListener('playing', () => {
                         let width = subscriber.videoWidth;
                         let height = subscriber.videoHeight;
 
-                        if(Janus.webRTCAdapter.browserDetails.browser === "firefox") {
+                        if (Janus.webRTCAdapter.browserDetails.browser === "firefox") {
                             // Firefox Stable has a bug: width and height are not immediately available after a playing
                             // setTimeout(function() {
                             //     // var width = $("#remotevideo"+remoteFeed.rfindex).get(0).videoWidth;
@@ -506,7 +496,7 @@ export default class ClassRoom extends Component {
 
                 Janus.attachMediaStream(remoteVideo, stream);
 
-                if(Janus.webRTCAdapter.browserDetails.browser === "chrome" || Janus.webRTCAdapter.browserDetails.browser === "firefox" ||
+                if (Janus.webRTCAdapter.browserDetails.browser === "chrome" || Janus.webRTCAdapter.browserDetails.browser === "firefox" ||
                     Janus.webRTCAdapter.browserDetails.browser === "safari") {
                     // this.bitrateTimer[remoteFeed.rfindex] = setInterval(function() {
                     //     // Display updated bitrate, if supported
@@ -518,9 +508,9 @@ export default class ClassRoom extends Component {
 
                 VideoContainer.append(remoteVideo);
             },
-            oncleanup(){
+            oncleanup() {
                 Janus.log(" ::: Got a cleanup notification (remote feed " + id + ") :::");
-                document.querySelector('#remotevideo'+remoteFeed.rfindex).remove();
+                document.querySelector('#remotevideo' + remoteFeed.rfindex).remove();
             }
         })
 
