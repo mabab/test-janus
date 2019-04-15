@@ -165,7 +165,7 @@ export default class ClassRoom extends Component {
                             Janus.log("Publisher left: " + leaving);
                             let remoteFeed = null;
 
-                            for (let i = 1; i < 6; i++) {
+                            for (let i = 1; i < this.MAX_SIZE_SUBSCRIBERS; i++) {
                                 if (this.feeds[i] && this.feeds[i] === leaving) {
                                     remoteFeed = this.feeds[i];
                                     break;
@@ -189,8 +189,8 @@ export default class ClassRoom extends Component {
 
                             let remoteFeed = null;
 
-                            for (let i = 1; i < 6; i++) {
-                                if (this.feeds[i] && this.feeds[i] === leaving) {
+                            for (let i = 1; i < this.MAX_SIZE_SUBSCRIBERS; i++) {
+                                if (this.feeds[i] && this.feeds[i] === unpublished) {
                                     remoteFeed = this.feeds[i];
                                     break;
                                 }
@@ -286,7 +286,7 @@ export default class ClassRoom extends Component {
             consentDialog(on) {
                 Janus.log("Consent dialog should be " + (on ? "on" : "off") + " now");
             },
-            webrtcState(on) {
+            webrtcState: (on) => {
                 Janus.log("Janus says our WebRTC PeerConnection is " + (on ? "up" : "down") + " now");
                 if (!on) {
                     return false;
@@ -297,7 +297,7 @@ export default class ClassRoom extends Component {
             oncleanup: () => {
                 Janus.log(" ::: Got a cleanup notification: we are unpublished now :::");
                 this.myStream = null;
-                this.publishOwnFeed(true);
+                // this.publishOwnFeed(true);
             }
         })
     }
@@ -325,7 +325,7 @@ export default class ClassRoom extends Component {
                     "request": "configure",
                     "audio": useAudio,
                     "video": true,
-                    "videocodec": "vp8"
+                    "videocodec": "h264"
                 };
                 // You can force a specific codec to use when publishing by using the
                 // audiocodec and videocodec properties, for instance:
@@ -406,7 +406,7 @@ export default class ClassRoom extends Component {
                     if (eventName === 'attached') {
 
                         for (let i = 1; i < this.MAX_SIZE_SUBSCRIBERS; i++) {
-                            if (this.feeds[i]) {
+                            if (!this.feeds[i]) {
                                 this.feeds[i] = remoteFeed;
                                 remoteFeed.rfindex = i;
                                 break;
@@ -510,7 +510,7 @@ export default class ClassRoom extends Component {
             },
             oncleanup() {
                 Janus.log(" ::: Got a cleanup notification (remote feed " + id + ") :::");
-                document.querySelector('#remotevideo' + remoteFeed.rfindex).remove();
+                document.querySelector('#remotedvideo-' + remoteFeed.rfindex).remove();
             }
         })
 
