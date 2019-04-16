@@ -267,6 +267,8 @@ export default class ClassRoom extends Component {
                 if (!videoElement) {
                     videoElement = document.createElement('video');
                     videoElement.id = 'publisher';
+
+                    VideoContainer.append(this.wrapItemVideo(videoElement, 'pub'));
                 }
 
                 videoElement.setAttribute('autoplay', '');
@@ -275,9 +277,6 @@ export default class ClassRoom extends Component {
 
                 Janus.attachMediaStream(videoElement, stream);
                 videoElement.muted = 'muted';
-
-
-                VideoContainer.append(videoElement);
             },
 
             error(error) {
@@ -492,7 +491,9 @@ export default class ClassRoom extends Component {
                             //     // var height = $("#remotevideo"+remoteFeed.rfindex).get(0).videoHeight;
                             // }, 2000);
                         }
-                    })
+                    });
+
+                    VideoContainer.append(this.wrapItemVideo(remoteVideo, 'sub'));
                 }
 
                 Janus.attachMediaStream(remoteVideo, stream);
@@ -507,14 +508,57 @@ export default class ClassRoom extends Component {
                     // }, 1000);
                 }
 
-                VideoContainer.append(remoteVideo);
             },
-            oncleanup() {
+            oncleanup: () => {
                 Janus.log(" ::: Got a cleanup notification (remote feed " + id + ") :::");
-                document.querySelector('#remotedvideo-' + remoteFeed.rfindex).remove();
+                this.removeVideoItem(document.querySelector('#remotedvideo-' + remoteFeed.rfindex));
             }
         })
 
+    }
+
+    wrapItemVideo(videoElement, type){
+        let wrapper = document.createElement('div');
+        wrapper.classList.add('col-md-4');
+        wrapper.classList.add('wrap-video');
+        wrapper.classList.add(type);
+
+        wrapper.append(videoElement);
+
+        if (type === 'pub'){
+            let btn = document.createElement('button');
+            btn.className = 'btn btn-warning btn-xs';
+            btn.textContent = 'Mute';
+            btn.onclick = this.toogleMute.bind(this);
+            wrapper.append(btn);
+        }
+
+        return wrapper;
+    }
+
+    removeVideoItem(videoElement){
+        let parent = videoElement.parent();
+
+        if (parent.classList.contains('wrap-video')){
+            parent.remove();
+        } else {
+            videoElement.remove();
+        }
+    }
+
+    toogleMute(e){
+        e.preventDefault();
+
+        let muted = this.sfuPlugin.isAudioMuted();
+        Janus.log((muted ? "Unmuting" : "Muting") + " local stream...");
+
+        if (muted){
+            this.sfuPlugin.unmuteAudio();
+        } else {
+            this.sfuPlugin.muteAudio();
+        }
+
+        e.target.textContent = muted ? "Unmute" : "Mute";
     }
 }
 
