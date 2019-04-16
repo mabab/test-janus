@@ -537,7 +537,7 @@ export default class ClassRoom extends Component {
     }
 
     removeVideoItem(videoElement){
-        let parent = videoElement.parent();
+        let parent = videoElement.parentNode;
 
         if (parent.classList.contains('wrap-video')){
             parent.remove();
@@ -558,7 +558,7 @@ export default class ClassRoom extends Component {
             this.sfuPlugin.muteAudio();
         }
 
-        e.target.textContent = muted ? "Unmute" : "Mute";
+        e.currentTarget.textContent = muted ? "Unmute" : "Mute";
     }
 }
 
