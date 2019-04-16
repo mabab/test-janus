@@ -310,7 +310,8 @@ export default class ClassRoom extends Component {
                 videoRecv: false,
                 audioSend: useAudio,
                 videoSend: true,
-                video: 'lowres'
+                video: 'lowres',
+                audio: {advanced: [{googEchoCancellation: {exact: true}}, {googAutoGainControl: {exact: true}}, {googNoiseReduction: {exact: true}}]}
             },	// Publishers are sendonly
 
             // If you want to test simulcasting (Chrome and Firefox only), then
@@ -511,7 +512,10 @@ export default class ClassRoom extends Component {
             },
             oncleanup: () => {
                 Janus.log(" ::: Got a cleanup notification (remote feed " + id + ") :::");
-                this.removeVideoItem(document.querySelector('#remotedvideo-' + remoteFeed.rfindex));
+                setTimeout(() =>{
+                    this.removeVideoItem(document.querySelector('#remotedvideo-' + remoteFeed.rfindex));
+                }, 0);
+
             }
         })
 
