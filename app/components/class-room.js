@@ -311,7 +311,18 @@ export default class ClassRoom extends Component {
                 audioSend: useAudio,
                 videoSend: true,
                 video: 'lowres',
-                audio: {advanced: [{googEchoCancellation: {exact: true}}, {googAutoGainControl: {exact: true}}, {googNoiseReduction: {exact: true}}]}
+                audio: {
+                    sampleRate: 48000,
+                    channelCount: 2,
+                    volume: 1.0,
+                    echoCancellation: true,
+                    googEchoCancellation: true,
+                    googAutoGainControl: true,
+                    googAutoGainControl2: true,
+                    googNoiseSuppression: true,
+                    googHighpassFilter: true,
+                    googTypingNoiseDetection: true,
+                }
             },	// Publishers are sendonly
 
             // If you want to test simulcasting (Chrome and Firefox only), then
