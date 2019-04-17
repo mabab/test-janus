@@ -312,7 +312,13 @@ export default class ClassRoom extends Component {
                 videoSend: true,
                 video: 'lowres',
                 audio: {
-                    echoCancellation: true,
+                    "mandatory": {
+                        "googTypingNoiseDetection":true,
+                        "googEchoCancellation": true,
+                        "googAutoGainControl": true,
+                        "googNoiseSuppression": true,
+                        "googHighpassFilter": true
+                    },
                 }
             },	// Publishers are sendonly
 
