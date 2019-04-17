@@ -325,7 +325,7 @@ export default class ClassRoom extends Component {
                     "request": "configure",
                     "audio": useAudio,
                     "video": true,
-                    "videocodec": "h264"
+                    "videocodec": "vp8"
                 };
                 // You can force a specific codec to use when publishing by using the
                 // audiocodec and videocodec properties, for instance:
