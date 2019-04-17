@@ -310,11 +310,7 @@ export default class ClassRoom extends Component {
                 videoRecv: false,
                 audioSend: useAudio,
                 videoSend: true,
-                video: 'lowres',
-                audio: {
-                    noiseSuppression: false,
-                    echoCancellation: false
-                }
+                video: 'lowres'
             },	// Publishers are sendonly
 
             // If you want to test simulcasting (Chrome and Firefox only), then
