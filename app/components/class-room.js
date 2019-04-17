@@ -231,10 +231,6 @@ export default class ClassRoom extends Component {
                     let audio = get(msg, 'audio_codec');
                     let video = get(msg, 'video_codec');
 
-                    console.log('------------------------------------------------------');
-                    console.log(this.myStream.getAudioTracks()[0].getSupportedConstraints);
-                    console.log('------------------------------------------------------');
-
                     if (
                         this.myStream &&
                         this.myStream.getAudioTracks() &&
@@ -316,15 +312,7 @@ export default class ClassRoom extends Component {
                 videoSend: true,
                 video: 'lowres',
                 audio: {
-                    mandatory: {
-                        echoCancellation: true,
-                        googEchoCancellation: true,
-                        googAutoGainControl: true,
-                        googAutoGainControl2: true,
-                        googNoiseSuppression: true,
-                        googHighpassFilter: true,
-                        googTypingNoiseDetection: true,
-                    }
+                    echoCancellation: true,
                 }
             },	// Publishers are sendonly
 
