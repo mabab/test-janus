@@ -316,6 +316,7 @@ export default class ClassRoom extends Component {
                     channelCount: 2,
                     volume: 1.0,
                     echoCancellation: true,
+                    noiseSuppression: true,
                     googEchoCancellation: true,
                     googAutoGainControl: true,
                     googAutoGainControl2: true,
